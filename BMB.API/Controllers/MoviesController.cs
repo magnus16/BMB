@@ -1,5 +1,6 @@
-﻿using BMB.Data.Abstractions;
+﻿
 using BMB.Entities.Models;
+using BMB.Services.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,23 +10,23 @@ namespace BMB.API.Controllers
     [Route("api/[controller]")]
     public class MoviesController : ControllerBase
     {
-        private readonly IMovieRepository _movieRepo;
-        public MoviesController(IMovieRepository movieRepo)
+        private readonly IMovieService _movieService;
+        public MoviesController(IMovieService movieService)
         {
-            _movieRepo = movieRepo;
+            _movieService = movieService;
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            var movies = _movieRepo.GetAll();
+            var movies = _movieService.GetAll();
             return Ok(movies);
         }
 
         [HttpPost]
         public IActionResult Add(Movie movie)
         {
-            _movieRepo.Create(movie);
+            _movieService.Add(movie);
             return Ok(new
             {
                 Message = $"Movie {movie.Title} has been added."

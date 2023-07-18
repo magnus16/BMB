@@ -1,6 +1,8 @@
 using BMB.Data.Abstractions;
 using BMB.Data;
 using BMB.Entities.DTO;
+using BMB.Services.Abstractions;
+using BMB.Services;
 
 namespace BMB.API
 {
@@ -15,9 +17,10 @@ namespace BMB.API
             builder.Services.AddControllers();
 
             builder.Services.Configure<ConnectionSetting>(builder.Configuration.GetSection("MongoDB"));
-            
+
             builder.Services.AddSingleton<IMongoDBContext, MongoDBContext>();
             builder.Services.AddSingleton<IMovieRepository, MovieRepository>();
+            builder.Services.AddSingleton<IMovieService, MovieService>();
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

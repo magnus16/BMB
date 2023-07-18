@@ -6,7 +6,7 @@ using MongoDB.Driver;
 
 namespace BMB.Services
 {
-    public class MovieService:IMovieService
+    public class MovieService : IMovieService
     {
         private readonly IMovieRepository _movieRepository;
         public MovieService(IMovieRepository movieRepository)
@@ -16,32 +16,33 @@ namespace BMB.Services
 
         public void Add(Movie movie)
         {
-            throw new NotImplementedException();
+            _movieRepository.Create(movie);
         }
 
         public void Delete(string id)
         {
-            throw new NotImplementedException();
+            _movieRepository.Delete(id);
         }
 
         public List<Movie> GetAll()
         {
-            throw new NotImplementedException();
+            return _movieRepository.GetAll().ToList();
         }
 
         public Movie GetById(string id)
         {
-            throw new NotImplementedException();
+            return _movieRepository.GetById(id);
         }
 
         public List<Movie> SearchByTitle(string query)
         {
-            throw new NotImplementedException();
+            var filter = Builders<Movie>.Filter.Regex("Title", new BsonRegularExpression(query));
+            return _movieRepository.Find(filter).ToList();
         }
 
         public void Update(Movie movie)
         {
-            throw new NotImplementedException();
+            _movieRepository.Update(movie.Id, movie);
         }
     }
 }

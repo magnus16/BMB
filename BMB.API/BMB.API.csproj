@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BMB.Data\BMB.Data.csproj" />
     <ProjectReference Include="..\BMB.Entities\BMB.Entities.csproj" />
+    <ProjectReference Include="..\BMB.Services\BMB.Services.csproj" />
   </ItemGroup>
 
 </Project>
