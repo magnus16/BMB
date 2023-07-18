@@ -3,7 +3,7 @@ using BMB.Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BMB.Controllers
+namespace BMB.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

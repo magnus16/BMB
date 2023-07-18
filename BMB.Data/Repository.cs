@@ -10,6 +10,6 @@ namespace BMB.Data
 {
     public class MovieRepository : BaseRepository<Movie>, IMovieRepository
     {
-        protected MovieRepository(IMongoDBContext context) : base(context) { }
+        public MovieRepository(IMongoDBContext context) : base(context) { }
     }
 }
