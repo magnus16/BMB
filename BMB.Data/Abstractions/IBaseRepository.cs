@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using BMB.Entities.Models;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BMB.Data.Abstractions
 {
-    public interface IBaseRepository<T> where T : class
+    public interface IBaseRepository<T> where T : BaseEntity
     {
         Task CreateAsync(T obj);
         Task UpdateAsync(string id, T obj);

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BMB.Data
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : class
+    public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
         private readonly IMongoDBContext _context;
         private IMongoCollection<T> _collection;
@@ -24,6 +24,10 @@ namespace BMB.Data
 
         public async Task CreateAsync(T obj)
         {
+            if (!string.IsNullOrEmpty(obj.Id))
+            {
+                obj.Id = string.Empty;
+            }
             await _collection.InsertOneAsync(obj);
         }
 
@@ -59,6 +63,10 @@ namespace BMB.Data
 
         public void Create(T obj)
         {
+            if (!string.IsNullOrEmpty(obj.Id))
+            {
+                obj.Id = string.Empty;
+            }
             _collection.InsertOne(obj);
         }
 

@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace BMB.Entities.Models
 {
-    public class User: BaseEntity
+    public abstract class BaseEntity
     {
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string? Email { get; set; } = string.Empty;
-
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        
+        public virtual string? Id { get; set; }
     }
 }
