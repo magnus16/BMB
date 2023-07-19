@@ -7,23 +7,39 @@ using MongoDB.Driver;
 
 namespace BMB.Services
 {
-    public class UserService:IUserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+
         public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
-    
-        public void Add(User user)
+
+        public void AddMovie(string userId, string movieId)
         {
-            _userRepository.Create(user);
+            var user = _userRepository.GetById(userId);
+            if (user.Movies == null)
+            {
+                user.Movies = new List<UserMovie>();
+            }
+            user.Movies.Add(new UserMovie()
+            {
+                MovieId = movieId
+            });
+            UpdateUser(user);
         }
-       
-        public void Delete(string id)
+
+        public void CreateUser(User user)
         {
-            _userRepository.Delete(id);
+            throw new NotImplementedException();
         }
+
+        public void DeleteUser(string id)
+        {
+            throw new NotImplementedException();
+        }
+
 
         public List<User> GetAll()
         {
@@ -35,5 +51,41 @@ namespace BMB.Services
             return _userRepository.GetById(id);
         }
 
+        public void ChangeMovieStatus(string userId, string movieId, bool watched)
+        {
+            User user = GetById(userId);
+            if (user.Movies == null)
+            {
+                throw new Exception("Movie doesn't exist in user's list.");
+            }
+            var movie = user.Movies.Where(m => m.MovieId == movieId).FirstOrDefault();
+            if (movie != null)
+            {
+                movie.Watched = watched;
+                movie.WatchedOn = watched ? DateTime.UtcNow : null;
+            }
+            UpdateUser(user);
+        }
+
+        public void RemoveMovie(string userId, string movieId)
+        {
+            User user = GetById(userId);
+            if (user.Movies == null)
+            {
+                throw new Exception("Movie doesn't exist in user's list.");
+            }
+
+            var movie = user.Movies.Where(m => m.MovieId == movieId).FirstOrDefault();
+            if (movie != null)
+            {
+                user.Movies.Remove(movie);
+            }
+            UpdateUser(user);
+        }
+
+        public void UpdateUser(User user)
+        {
+            _userRepository.Update(user.Id, user);
+        }
     }
 }

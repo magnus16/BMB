@@ -12,7 +12,7 @@ namespace BMB.Entities.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        
-        public virtual string? Id { get; set; }
+
+        public virtual string Id { get; set; } = string.Empty;
     }
 }
