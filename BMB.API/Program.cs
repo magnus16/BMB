@@ -25,9 +25,11 @@ namespace BMB.API
 
             builder.Services.AddSingleton<IMongoDBContext, MongoDBContext>();
             builder.Services.AddSingleton<IMovieRepository, MovieRepository>();
-            builder.Services.AddSingleton<IMovieService, MovieService>();
             builder.Services.AddSingleton<IUserRepository, UserRepository>();
+            builder.Services.AddSingleton<IUserMovieRepository, UserMovieRepository>();
+            builder.Services.AddSingleton<IMovieService, MovieService>();
             builder.Services.AddSingleton<IUserService, UserService>();
+            builder.Services.AddSingleton<IUserMovieService, UserMovieService>();
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -36,11 +38,11 @@ namespace BMB.API
             //builder.Services.AddSwaggerGen();
             var JwtKey = builder.Configuration.GetSection("Jwt:Key").Value;
             var JwtIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value;
-            
+
             // Enable Swagger   
             builder.Services.AddSwaggerGen(swagger =>
             {
-                
+
                 // To Enable authorization using Swagger (JWT)  
                 swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
@@ -96,8 +98,8 @@ namespace BMB.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-          
-            app.UseHttpsRedirection();       
+
+            app.UseHttpsRedirection();
 
             app.UseRouting();
             app.UseAuthentication();
@@ -106,8 +108,8 @@ namespace BMB.API
             {
                 endpoints.MapControllers();
             });
-            
-          
+
+
             // Swagger Configuration in API  
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -115,7 +117,7 @@ namespace BMB.API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
 
             });
-         
+
 
             app.Run();
         }

@@ -10,12 +10,12 @@ namespace BMB.Data.Abstractions
 {
     public interface IBaseRepository<T> where T : BaseEntity
     {
-        Task CreateAsync(T obj);
-        Task UpdateAsync(string id, T obj);
-        Task DeleteAsync(string id);
-        Task<T> GetByIdAsync(string id);
-        Task<IEnumerable<T>> GetAllAsync();
-        Task<IEnumerable<T>> FindAsync(FilterDefinition<T> filter);
+        //Task CreateAsync(T obj);
+        //Task UpdateAsync(string id, T obj);
+        //Task DeleteAsync(string id);
+        //Task<T> GetByIdAsync(string id);
+        //Task<IEnumerable<T>> GetAllAsync();
+        //Task<IEnumerable<T>> FindAsync(FilterDefinition<T> filter);
 
         void Create(T obj);
         void Update(string id, T obj);
@@ -23,5 +23,7 @@ namespace BMB.Data.Abstractions
         T GetById(string id);
         IEnumerable<T> GetAll();
         IEnumerable<T> Find(FilterDefinition<T> filter);
+
+        IMongoCollection<T> GetCollection();
     }
 }

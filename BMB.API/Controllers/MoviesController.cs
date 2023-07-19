@@ -18,7 +18,7 @@ namespace BMB.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult GetAll()
         {
             var movies = _movieService.GetAll();

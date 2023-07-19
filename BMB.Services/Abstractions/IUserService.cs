@@ -14,8 +14,6 @@ namespace BMB.Services.Abstractions
         void CreateUser(User user);
         void DeleteUser(string id);
         void UpdateUser(User user);
-        void AddMovie(string userId, string movieId);
-        void RemoveMovie(string userId, string movieId);
-        void ChangeMovieStatus(string userId, string movieId, bool watched);
+        
     }
 }

@@ -22,44 +22,44 @@ namespace BMB.Data
             _collection = _context.GetCollection<T>(typeof(T).Name);
         }
 
-        public async Task CreateAsync(T obj)
-        {
-            if (!string.IsNullOrEmpty(obj.Id))
-            {
-                obj.Id = string.Empty;
-            }
-            await _collection.InsertOneAsync(obj);
-        }
+        //public async Task CreateAsync(T obj)
+        //{
+        //    if (!string.IsNullOrEmpty(obj.Id))
+        //    {
+        //        obj.Id = string.Empty;
+        //    }
+        //    await _collection.InsertOneAsync(obj);
+        //}
 
-        public async Task DeleteAsync(string id)
-        {
-            var filter = Builders<T>.Filter.Eq("_id", ObjectId.Parse(id));
-            await _collection.DeleteOneAsync(filter);
-        }
+        //public async Task DeleteAsync(string id)
+        //{
+        //    var filter = Builders<T>.Filter.Eq("_id", ObjectId.Parse(id));
+        //    await _collection.DeleteOneAsync(filter);
+        //}
 
-        public async Task<T> GetByIdAsync(string id)
-        {
-            var filter = Builders<T>.Filter.Eq("_id", ObjectId.Parse(id));
-            return await _collection.FindAsync(filter).Result.FirstOrDefaultAsync();
-        }
+        //public async Task<T> GetByIdAsync(string id)
+        //{
+        //    var filter = Builders<T>.Filter.Eq("_id", ObjectId.Parse(id));
+        //    return await _collection.FindAsync(filter).Result.FirstOrDefaultAsync();
+        //}
 
-        public async Task<IEnumerable<T>> GetAllAsync()
-        {
-            var list = await _collection.FindAsync(Builders<T>.Filter.Empty);
-            return await list.ToListAsync();
-        }
+        //public async Task<IEnumerable<T>> GetAllAsync()
+        //{
+        //    var list = await _collection.FindAsync(Builders<T>.Filter.Empty);
+        //    return await list.ToListAsync();
+        //}
 
-        public async Task UpdateAsync(string id, T obj)
-        {
-            var filter = Builders<T>.Filter.Eq("_id", ObjectId.Parse(id));
-            await _collection.ReplaceOneAsync(filter, obj);
-        }
+        //public async Task UpdateAsync(string id, T obj)
+        //{
+        //    var filter = Builders<T>.Filter.Eq("_id", ObjectId.Parse(id));
+        //    await _collection.ReplaceOneAsync(filter, obj);
+        //}
 
-        public async Task<IEnumerable<T>> FindAsync(FilterDefinition<T> filter)
-        {
-            var res = await _collection.FindAsync(filter);
-            return await res.ToListAsync();
-        }
+        //public async Task<IEnumerable<T>> FindAsync(FilterDefinition<T> filter)
+        //{
+        //    var res = await _collection.FindAsync(filter);
+        //    return await res.ToListAsync();
+        //}
 
         public void Create(T obj)
         {
@@ -83,7 +83,7 @@ namespace BMB.Data
 
         public T GetById(string id)
         {
-            throw new NotImplementedException();
+            return _collection.Find(x => x.Id == id).FirstOrDefault();
         }
 
         public IEnumerable<T> GetAll()
@@ -94,6 +94,11 @@ namespace BMB.Data
         public IEnumerable<T> Find(FilterDefinition<T> filter)
         {
             return _collection.Find(filter).ToList();
+        }
+
+        public IMongoCollection<T> GetCollection()
+        {
+            return _collection;
         }
     }
 }

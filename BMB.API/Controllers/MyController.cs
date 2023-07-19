@@ -11,22 +11,48 @@ namespace BMB.API.Controllers
     {
         private readonly IMovieService _movieService;
         private readonly IUserService _userService;
+        private readonly IUserMovieService _userMovieService;
 
-        public MyController(IMovieService movieService, IUserService userService)
+        public MyController(IMovieService movieService, IUserService userService, IUserMovieService userMovieService)
         {
             _movieService = movieService;
             _userService = userService;
+            _userMovieService = userMovieService;
         }
 
         [HttpGet]
-        public IActionResult Get()
+        [Route("{userId}")]
+        public IActionResult Get(string userId)
         {
-            string loggedInUserId = "";
+            var movies = _userMovieService.GetMoviesForUser(userId);
+            return Ok(movies);
+        }
 
-            //User user = 
-
+        [HttpPost]
+        [Route("{userId}/AddMovie/{movieId}")]
+        public IActionResult AddMovie(string userId, string movieId)
+        {
+            _userMovieService.AddMovieToUserList(userId, movieId);
             return Ok();
         }
+
+        [HttpPost]
+        [Route("{userId}/RemoveMovie/{movieId}")]
+        public IActionResult RemoveMovie(string userId, string movieId)
+        {
+            _userMovieService.RemoveMovieFromUserList(userId, movieId);
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("{userId}/Watched/{movieId}")]
+        public IActionResult Watched(string userId, string movieId)
+        {
+            _userMovieService.ChangeMovieWatchStatus(userId, movieId, true);
+            return Ok();
+        }
+
+
 
     }
 }

@@ -9,7 +9,7 @@ namespace BMB.Data.Abstractions
 {
     public interface IMovieRepository : IBaseRepository<Movie> { }
     public interface IUserRepository : IBaseRepository<User> { }
-
+    public interface IUserMovieRepository:IBaseRepository<UserMovie> { }
 
 
 }
