@@ -12,4 +12,9 @@ namespace BMB.Data
     {
         public MovieRepository(IMongoDBContext context) : base(context) { }
     }
+
+    public class UserRepository : BaseRepository<User>, IUserRepository
+    {
+        public UserRepository(IMongoDBContext context) : base(context) { }
+    }
 }

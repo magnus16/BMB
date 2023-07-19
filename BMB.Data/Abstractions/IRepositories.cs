@@ -11,4 +11,5 @@ namespace BMB.Data.Abstractions
     public interface IUserRepository : IBaseRepository<User> { }
 
 
+
 }
