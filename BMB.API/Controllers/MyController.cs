@@ -1,4 +1,5 @@
-﻿using BMB.Services.Abstractions;
+﻿using BMB.Entities.Models;
+using BMB.Services.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +23,7 @@ namespace BMB.API.Controllers
         {
             string loggedInUserId = "";
 
-            //User user 
+            //User user = 
 
             return Ok();
         }
