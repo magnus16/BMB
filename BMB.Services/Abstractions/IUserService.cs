@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BMB.Entities.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,13 @@ namespace BMB.Services.Abstractions
 {
     public interface IUserService
     {
+        User GetById(string id);
 
+        List<User> GetAll();
+        void CreateUser(User user);
+        void DeleteUser(string id);
+        void AddMovie(string userId, string movieId);
+        void RemoveMovie(string userId, string movieId);
+        void MarkMovieAsWatched(string userId, string movieId);
     }
 }
