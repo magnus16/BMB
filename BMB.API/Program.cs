@@ -3,6 +3,11 @@ using BMB.Data;
 using BMB.Entities.DTO;
 using BMB.Services.Abstractions;
 using BMB.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 
 namespace BMB.API
 {
@@ -27,23 +32,90 @@ namespace BMB.API
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddMvc();
+            //builder.Services.AddSwaggerGen();
+            var JwtKey = builder.Configuration.GetSection("Jwt:Key").Value;
+            var JwtIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value;
+            
+            // Enable Swagger   
+            builder.Services.AddSwaggerGen(swagger =>
+            {
+                
+                // To Enable authorization using Swagger (JWT)  
+                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
+                });
+                swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                          new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            new string[] {}
+
+                    }
+                });
+            });
+
+            builder.Services.AddAuthentication(option =>
+            {
+                option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = false,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = JwtIssuer,
+                    ValidAudience = JwtIssuer,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey)) //Configuration["JwtToken:SecretKey"]  
+                };
+            });
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
+            app.MapControllers();
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+          
+            app.UseHttpsRedirection();       
 
-            app.UseHttpsRedirection();
-
+            app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+            
+          
+            // Swagger Configuration in API  
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
 
-
-            app.MapControllers();
+            });
+         
 
             app.Run();
         }

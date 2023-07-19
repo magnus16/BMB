@@ -1,6 +1,7 @@
 ﻿
 using BMB.Entities.Models;
 using BMB.Services.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,7 @@ namespace BMB.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult GetAll()
         {
             var movies = _movieService.GetAll();

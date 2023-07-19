@@ -2,6 +2,7 @@
 using BMB.Entities.Models;
 using BMB.Services;
 using BMB.Services.Abstractions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -59,9 +60,9 @@ namespace BMB.API.Controllers
         {
             User user = null;
 
-            //Validate the User Credentials      
-            //Demo Purpose, I have Passed HardCoded User Information      
-            if (login.Username == "Jay")
+            //Validate the User Credentials     
+             
+            if (login.Username == "Archana")
             {
                 user = new User { Username = "Archana", Password = "123456" };
             }
@@ -80,5 +81,19 @@ namespace BMB.API.Controllers
             }
             return response;
         }
+       
+        /// <summary>  
+        /// Authorize the Method  
+        /// </summary>  
+        /// <returns></returns>  
+        [HttpGet(nameof(Get))]
+        public async Task<IEnumerable<string>> Get()
+        {
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+
+            return new string[] { accessToken };
+        }
+
+
     }
 }
