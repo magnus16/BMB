@@ -32,12 +32,12 @@ namespace BMB.Services
 
         public void CreateUser(User user)
         {
-            throw new NotImplementedException();
+            _userRepository.Create(user);
         }
 
         public void DeleteUser(string id)
         {
-            throw new NotImplementedException();
+            _userRepository.Delete(id);
         }
 
 
@@ -48,7 +48,12 @@ namespace BMB.Services
 
         public User GetById(string id)
         {
-            return _userRepository.GetById(id);
+            throw new NotImplementedException();
+        }
+
+        public void MarkMovieAsWatched(string userId, string movieId)
+        {
+            throw new NotImplementedException();
         }
 
         public void ChangeMovieStatus(string userId, string movieId, bool watched)

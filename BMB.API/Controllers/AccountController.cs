@@ -28,7 +28,7 @@ namespace BMB.API.Controllers
         [HttpPost]
         public IActionResult AddUser(User user)
         {
-            _userService.Add(user);
+            _userService.CreateUser(user);
             return Ok(new
             {
                 Message = $"User  {user.Username} has been added."
