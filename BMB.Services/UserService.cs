@@ -1,4 +1,5 @@
-﻿using BMB.Data.Abstractions;
+﻿using BMB.Data;
+using BMB.Data.Abstractions;
 using BMB.Entities.Models;
 using BMB.Services.Abstractions;
 using MongoDB.Bson;
@@ -13,7 +14,26 @@ namespace BMB.Services
         {
             _userRepository = userRepository;
         }
+    
+        public void Add(User user)
+        {
+            _userRepository.Create(user);
+        }
+       
+        public void Delete(string id)
+        {
+            _userRepository.Delete(id);
+        }
 
+        public List<User> GetAll()
+        {
+            return _userRepository.GetAll().ToList();
+        }
+
+        public User GetById(string id)
+        {
+            return _userRepository.GetById(id);
+        }
 
     }
 }

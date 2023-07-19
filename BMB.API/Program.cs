@@ -21,6 +21,8 @@ namespace BMB.API
             builder.Services.AddSingleton<IMongoDBContext, MongoDBContext>();
             builder.Services.AddSingleton<IMovieRepository, MovieRepository>();
             builder.Services.AddSingleton<IMovieService, MovieService>();
+            builder.Services.AddSingleton<IUserRepository, UserRepository>();
+            builder.Services.AddSingleton<IUserService, UserService>();
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
