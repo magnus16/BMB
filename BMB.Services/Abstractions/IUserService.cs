@@ -17,6 +17,6 @@ namespace BMB.Services.Abstractions
         void UpdateUser(User user);
         bool ValidateUser(string userName, string password, out User? user);
 
-
+        string HashPassword(string password);
     }
 }

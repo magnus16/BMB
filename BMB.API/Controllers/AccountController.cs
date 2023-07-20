@@ -31,7 +31,7 @@ namespace BMB.API.Controllers
 
         [HttpPost("AddUser")]
         public IActionResult AddUser(User user)
-        {
+        {        
             _userService.CreateUser(user);
             return Ok(new
             {

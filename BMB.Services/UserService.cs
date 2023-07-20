@@ -4,6 +4,8 @@ using BMB.Entities.Models;
 using BMB.Services.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BMB.Services
 {
@@ -18,6 +20,7 @@ namespace BMB.Services
 
         public void CreateUser(User user)
         {
+            user.Password=HashPassword(user.Password);
             _userRepository.Create(user);
         }
 
@@ -44,9 +47,20 @@ namespace BMB.Services
         }
         public bool ValidateUser(string userName, string password, out User? user)
         {
-            var filter = Builders<User>.Filter.Where(usr => usr.Username == userName && usr.Password == password);
+            var pwd = HashPassword(password);
+            var filter = Builders<User>.Filter.Where(usr =>usr.Username == userName && usr.Password == pwd);
             user = _userRepository.Find(filter).FirstOrDefault();
             return user != null;
+        }
+        public string HashPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+               var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                // Get the hashed string.  
+                var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();               
+                return hash;
+            }
         }
     }
 }
