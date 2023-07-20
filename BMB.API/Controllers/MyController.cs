@@ -25,7 +25,7 @@ namespace BMB.API.Controllers
         [HttpGet]
         [Route("{userId}")]
         public IActionResult Get(string userId)
-        {
+        {            
             var movies = _userMovieService.GetMoviesForUser(userId);
             return Ok(movies);
         }

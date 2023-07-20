@@ -1,4 +1,5 @@
-﻿using BMB.Entities.Models;
+﻿using BMB.Entities.DTO;
+using BMB.Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace BMB.Services.Abstractions
         void CreateUser(User user);
         void DeleteUser(string id);
         void UpdateUser(User user);
-        
+        bool ValidateUser(string userName,string password);
+      
+
     }
 }

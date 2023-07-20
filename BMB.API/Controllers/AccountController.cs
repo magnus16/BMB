@@ -1,4 +1,5 @@
 ﻿using BMB.Data.Abstractions;
+using BMB.Entities.DTO;
 using BMB.Entities.Models;
 using BMB.Services;
 using BMB.Services.Abstractions;
@@ -26,9 +27,9 @@ namespace BMB.API.Controllers
             _userService = userService;
             _config = config;
         }
-
-
-        [HttpPost]
+    
+        [AllowAnonymous]
+        [HttpPost(nameof(AddUser))]
         public IActionResult AddUser(User user)
         {
             _userService.CreateUser(user);
@@ -37,23 +38,21 @@ namespace BMB.API.Controllers
                 Message = $"User  {user.Username} has been added."
             });
         }
-
-        [HttpGet]
+        
+        [HttpGet(nameof(GetAllUsers))]
         public IActionResult GetAllUsers()
         {
             var users = _userService.GetAll();
             return Ok(users);
         }
-
-        private string GenerateJSONWebToken(User userInfo)
+        private string GenerateJSONWebToken(UserLogin userInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             List<Claim> claims = new List<Claim>()
             {
                 new Claim("Id", Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, userInfo.Username),
-                new Claim(JwtRegisteredClaimNames.Email, userInfo.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, userInfo.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
 
@@ -70,39 +69,34 @@ namespace BMB.API.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return tokenString;
-        }
-        private async Task<User> AuthenticateUser(User login)
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }       
+        private async Task<UserLogin> AuthenticateUser(UserLogin login)
         {
-            User user = null;
-
-            //Validate the User Credentials     
-
-            if (login.Username == "Archana")
+            UserLogin user = null;
+            //Validate the User Credentials 
+            bool isExist = _userService.ValidateUser(login.UserName,login.Password);
+            if (isExist == true)
             {
-                user = new User { Username = "Archana", Password = "123456" };
+                user = new UserLogin { UserName = login.UserName, Password = login.Password};
             }
             return user;
         }
         [AllowAnonymous]
         [HttpPost(nameof(Login))]
-        public async Task<IActionResult> Login([FromBody] User data)
+        public async Task<IActionResult> Login([FromBody] UserLogin data)
         {
             IActionResult response = Unauthorized();
             var user = await AuthenticateUser(data);
-            if (data != null)
+            if (data != null && user!=null)
             {
                 var tokenString = GenerateJSONWebToken(user);
                 response = Ok(new { Token = tokenString, Message = "Success" });
             }
             return response;
         }
-
-        /// <summary>  
-        /// Authorize the Method  
-        /// </summary>  
-        /// <returns></returns>  
-        [HttpGet(nameof(Get))]
+        [HttpGet]
+        [Route("GetToken")]
         public async Task<IEnumerable<string>> Get()
         {
             var accessToken = await HttpContext.GetTokenAsync("access_token");

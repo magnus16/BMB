@@ -42,5 +42,15 @@ namespace BMB.Services
         {
             _userRepository.Update(user.Id, user);
         }
+        public bool ValidateUser(string userName, string password)
+        {
+            bool isValidate = false;
+            var userDetails=_userRepository.GetAll().ToList().Where(x=>x.Username==userName && x.Password==password).FirstOrDefault();           
+            if (userDetails != null)
+            {
+                isValidate= true;
+            }
+            return isValidate;
+        }
     }
 }

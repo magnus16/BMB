@@ -9,6 +9,7 @@ namespace BMB.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     public class MoviesController : ControllerBase
     {
         private readonly IMovieService _movieService;
@@ -17,8 +18,7 @@ namespace BMB.API.Controllers
             _movieService = movieService;
         }
 
-        [HttpGet]
-        //[Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet]     
         public IActionResult GetAll()
         {
             var movies = _movieService.GetAll();
