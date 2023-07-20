@@ -42,15 +42,11 @@ namespace BMB.Services
         {
             _userRepository.Update(user.Id, user);
         }
-        public bool ValidateUser(string userName, string password)
+        public bool ValidateUser(string userName, string password, out User? user)
         {
-            bool isValidate = false;
-            var userDetails=_userRepository.GetAll().ToList().Where(x=>x.Username==userName && x.Password==password).FirstOrDefault();           
-            if (userDetails != null)
-            {
-                isValidate= true;
-            }
-            return isValidate;
+            var filter = Builders<User>.Filter.Where(usr => usr.Username == userName && usr.Password == password);
+            user = _userRepository.Find(filter).FirstOrDefault();
+            return user != null;
         }
     }
 }

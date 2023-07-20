@@ -15,8 +15,8 @@ namespace BMB.Services.Abstractions
         void CreateUser(User user);
         void DeleteUser(string id);
         void UpdateUser(User user);
-        bool ValidateUser(string userName,string password);
-      
+        bool ValidateUser(string userName, string password, out User? user);
+
 
     }
 }

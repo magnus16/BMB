@@ -3,6 +3,7 @@ using BMB.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static BMB.API.Extensions.IdentityExtension;
 
 namespace BMB.API.Controllers
 {
@@ -21,7 +22,9 @@ namespace BMB.API.Controllers
         [HttpGet]
         [Route("{userId}")]
         public IActionResult Get(string userId)
-        {            
+        {
+            var uID = User.Identity.GetUserId();
+
             var movies = _userMovieService.GetMoviesForUser(userId);
             return Ok(movies);
         }
