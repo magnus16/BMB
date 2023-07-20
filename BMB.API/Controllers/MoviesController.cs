@@ -25,7 +25,16 @@ namespace BMB.API.Controllers
             return Ok(movies);
         }
 
+        [HttpGet]
+        [Route("{movieId}")]
+        public IActionResult Get(string movieId)
+        {
+            var movie = _movieService.GetById(movieId);
+            return Ok(movie);
+        }
+
         [HttpPost]
+        [Route("New")]
         public IActionResult Add(Movie movie)
         {
             _movieService.Add(movie);
@@ -34,5 +43,21 @@ namespace BMB.API.Controllers
                 Message = $"Movie {movie.Title} has been added."
             });
         }
+
+        [HttpPost]
+        [Route("Update")]
+        public IActionResult Update(Movie movie)
+        {
+            _movieService.Update(movie);
+            return Ok(new
+            {
+                Message = $"Movie {movie.Title} has been updateds."
+            });
+        }
+
+
+
+
+
     }
 }

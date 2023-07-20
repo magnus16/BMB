@@ -52,7 +52,7 @@ namespace BMB.API.Controllers
             List<Claim> claims = new List<Claim>()
             {
                 new Claim("Id", Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, userInfo.UserName),
+                new Claim(ClaimTypes.Name,userInfo.Username)
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
 

@@ -11,14 +11,10 @@ namespace BMB.API.Controllers
     [ApiController]
     public class MyController : ControllerBase
     {
-        private readonly IMovieService _movieService;
-        private readonly IUserService _userService;
         private readonly IUserMovieService _userMovieService;
 
-        public MyController(IMovieService movieService, IUserService userService, IUserMovieService userMovieService)
+        public MyController(IUserMovieService userMovieService)
         {
-            _movieService = movieService;
-            _userService = userService;
             _userMovieService = userMovieService;
         }
 
