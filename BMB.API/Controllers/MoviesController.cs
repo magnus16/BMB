@@ -1,4 +1,5 @@
 ﻿
+using BMB.Entities.DTO;
 using BMB.Entities.Models;
 using BMB.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,7 @@ namespace BMB.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     public class MoviesController : ControllerBase
     {
         private readonly IMovieService _movieService;
@@ -18,25 +19,43 @@ namespace BMB.API.Controllers
             _movieService = movieService;
         }
 
-        [HttpGet]     
-        public IActionResult GetAll()
+        [HttpGet]
+        public IActionResult Get(MovieSearchParams searchParams)
         {
-            var movies = _movieService.GetAll();
+            var movies = _movieService.Get(searchParams);
             return Ok(movies);
         }
+
 
         [HttpGet]
         [Route("{movieId}")]
         public IActionResult Get(string movieId)
         {
+            if (string.IsNullOrEmpty(movieId))
+            {
+                throw new ArgumentNullException("movieId");
+            }
             var movie = _movieService.GetById(movieId);
+            if (movie == null)
+            {
+                return NotFound();
+            }
             return Ok(movie);
         }
+
 
         [HttpPost]
         [Route("New")]
         public IActionResult Add(Movie movie)
         {
+            if (movie == null)
+            {
+                return BadRequest();
+            }
+            if (string.IsNullOrEmpty(movie.Title))
+            {
+                return BadRequest("Movie title is required");
+            }
             _movieService.Add(movie);
             return Ok(new
             {
@@ -48,10 +67,37 @@ namespace BMB.API.Controllers
         [Route("Update")]
         public IActionResult Update(Movie movie)
         {
+            if (movie == null)
+            {
+                return BadRequest();
+            }
+            if (string.IsNullOrEmpty(movie.Id))
+            {
+                return BadRequest("Movie id is required");
+            }
+            if (string.IsNullOrEmpty(movie.Title))
+            {
+                return BadRequest("Movie title is required");
+            }
             _movieService.Update(movie);
             return Ok(new
             {
                 Message = $"Movie {movie.Title} has been updateds."
+            });
+        }
+
+        [HttpDelete]
+        [Route("Delete/{movieId}")]
+        public IActionResult Delete(string movieId)
+        {
+            if (string.IsNullOrEmpty(movieId))
+            {
+                return BadRequest("Movie id is required");
+            }
+            _movieService.Delete(movieId);
+            return Ok(new
+            {
+                Message = $"Movie with id#{movieId} has been updateds."
             });
         }
 

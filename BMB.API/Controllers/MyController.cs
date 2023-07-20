@@ -20,37 +20,67 @@ namespace BMB.API.Controllers
         }
 
         [HttpGet]
-        [Route("{userId}")]
-        public IActionResult Get(string userId)
+        public IActionResult Get()
         {
-            var uID = User.Identity.GetUserId();
-
-            var movies = _userMovieService.GetMoviesForUser(userId);
-            return Ok(movies);
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userId = User.Identity.GetUserId();
+                var movies = _userMovieService.GetMoviesForUser(userId);
+                return Ok(movies);
+            }
+            return Unauthorized();
         }
 
         [HttpPost]
-        [Route("{userId}/AddMovie/{movieId}")]
-        public IActionResult AddMovie(string userId, string movieId)
+        [Route("AddMovie/{movieId}")]
+        public IActionResult AddMovie(string movieId)
         {
-            _userMovieService.AddMovieToUserList(userId, movieId);
-            return Ok();
+            if (string.IsNullOrEmpty(movieId))
+            {
+                return BadRequest("Movie Id is required");
+            }
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userId = User.Identity.GetUserId();
+                _userMovieService.AddMovieToUserList(userId, movieId);
+                return Ok();
+            }
+            return Unauthorized();
         }
 
         [HttpPost]
-        [Route("{userId}/RemoveMovie/{movieId}")]
-        public IActionResult RemoveMovie(string userId, string movieId)
+        [Route("RemoveMovie/{movieId}")]
+        public IActionResult RemoveMovie(string movieId)
         {
-            _userMovieService.RemoveMovieFromUserList(userId, movieId);
-            return Ok();
+            if (string.IsNullOrEmpty(movieId))
+            {
+                return BadRequest("Movie Id is required");
+            }
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userId = User.Identity.GetUserId();
+                _userMovieService.RemoveMovieFromUserList(userId, movieId);
+                return Ok();
+            }
+            return Unauthorized();
+
         }
 
         [HttpPost]
-        [Route("{userId}/Watched/{movieId}")]
-        public IActionResult Watched(string userId, string movieId)
+        [Route("Watched/{movieId}")]
+        public IActionResult Watched(string movieId)
         {
-            _userMovieService.ChangeMovieWatchStatus(userId, movieId, true);
-            return Ok();
+            if (string.IsNullOrEmpty(movieId))
+            {
+                return BadRequest("Movie Id is required");
+            }
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userId = User.Identity.GetUserId();
+                _userMovieService.ChangeMovieWatchStatus(userId, movieId, true);
+                return Ok();
+            }
+            return Unauthorized();
         }
 
 

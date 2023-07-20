@@ -1,4 +1,5 @@
-﻿using BMB.Entities.Models;
+﻿using BMB.Entities.DTO;
+using BMB.Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace BMB.Services.Abstractions
 {
     public interface IMovieService
     {
+        List<Movie> Get(MovieSearchParams searchParams);
         List<Movie> GetAll();
         Movie GetById(string id);
-        List<Movie> SearchByTitle(string query);
         void Add(Movie movie);
         void Update(Movie movie);
         void Delete(string id);
