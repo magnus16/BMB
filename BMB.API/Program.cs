@@ -74,6 +74,7 @@ namespace BMB.API
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 
             }).AddJwtBearer(options =>
             {
@@ -88,6 +89,9 @@ namespace BMB.API
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey)) //Configuration["JwtToken:SecretKey"]  
                 };
             });
+
+            builder.Services.AddAuthorization();
+
 
             var app = builder.Build();
 

@@ -4,11 +4,13 @@ using BMB.Services;
 using BMB.Services.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace BMB.API.Controllers
@@ -21,7 +23,7 @@ namespace BMB.API.Controllers
         private readonly IUserService _userService;
         public AccountController(IUserService userService, IConfiguration config)
         {
-            _userService = userService; 
+            _userService = userService;
             _config = config;
         }
 
@@ -47,21 +49,35 @@ namespace BMB.API.Controllers
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            List<Claim> claims = new List<Claim>()
+            {
+                new Claim("Id", Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, userInfo.Username),
+                new Claim(JwtRegisteredClaimNames.Email, userInfo.Email),
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+            };
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-              _config["Jwt:Issuer"],
-              null,
-              expires: DateTime.Now.AddMinutes(120),
-              signingCredentials: credentials);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(120),
+                Issuer = _config["Jwt:Issuer"],
+                Audience = _config["Jwt:Issuer"],
+                SigningCredentials = credentials
+            };
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+
+            return tokenString;
         }
         private async Task<User> AuthenticateUser(User login)
         {
             User user = null;
 
             //Validate the User Credentials     
-             
+
             if (login.Username == "Archana")
             {
                 user = new User { Username = "Archana", Password = "123456" };
@@ -81,7 +97,7 @@ namespace BMB.API.Controllers
             }
             return response;
         }
-       
+
         /// <summary>  
         /// Authorize the Method  
         /// </summary>  
