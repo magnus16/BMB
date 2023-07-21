@@ -19,17 +19,27 @@ namespace BMB.API.Controllers
             _movieService = movieService;
         }
 
+
+
         [HttpGet]
-        public IActionResult Get(MovieSearchParams searchParams)
+        public IActionResult Get(MovieSearchParams? searchParams = null)
         {
-            var movies = _movieService.Get(searchParams);
+            List<Movie> movies;
+            if (searchParams == null)
+            {
+                movies = _movieService.GetAll();
+            }
+            else
+            {
+                movies = _movieService.Get(searchParams);
+            }
             return Ok(movies);
         }
 
 
         [HttpGet]
-        [Route("{movieId}")]
-        public IActionResult Get(string movieId)
+        [Route("Details/{movieId}")]
+        public IActionResult Details(string movieId)
         {
             if (string.IsNullOrEmpty(movieId))
             {

@@ -59,6 +59,8 @@ namespace BMB.Services
 
             //var res = userCollection.Aggregate()
             //                        .Unwind<User, UserMovieDTO>(x => x.Movies).ToList();
+
+            
             List<UserMovieDTO> userMoviesDTO = userMovieCollection.AsQueryable()
                                     .Where(u => u.UserId == userId)
                                     .Join(movieCollection.AsQueryable(), um => um.MovieId, mov => mov.Id, (um, mov) => new UserMovieDTO()

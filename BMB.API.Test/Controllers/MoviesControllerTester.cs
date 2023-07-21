@@ -5,11 +5,6 @@ using BMB.Services.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BMB.API.Test.Controllers
 {
@@ -29,17 +24,18 @@ namespace BMB.API.Test.Controllers
                                 m.Get(It.Is<MovieSearchParams>(sp =>
                                         !string.IsNullOrEmpty(sp.searchQuery) && sp.searchQuery == MOVIE_TITLE)))
                         .Returns(GetListOfMovies());
-            //_movieService.Setup(m =>
-            //m.Add(It.Is<Movie>(s => string.Sear))).Returns
+            _movieService.Setup(m =>
+                                m.GetAll())
+                          .Returns(GetListOfMovies());
         }
 
 
         [Theory]
         [InlineData(MOVIE_ID)]
-        public void Get_SendId_ReturnsMovieObject(string id)
+        public void Details_SendId_ReturnsMovieObject(string id)
         {
-            var movieController = new MoviesController(_movieService.Object);
-            var result = movieController.Get(id);
+            var movieController = GetControllerInstance();
+            var result = movieController.Details(id);
             var okResult = result as ObjectResult;
 
             Assert.NotNull(okResult);
@@ -50,21 +46,34 @@ namespace BMB.API.Test.Controllers
 
         [Theory]
         [InlineData("123abc")]
-        public void Get_SendWrongId_ReturnNotFound(string id)
+        public void Details_SendWrongId_ReturnNotFound(string id)
         {
-            var movieController = new MoviesController(_movieService.Object);
-            var result = movieController.Get(id);
+            var movieController = GetControllerInstance();
+            var result = movieController.Details(id);
             Assert.IsType<NotFoundResult>(result);
         }
 
         [Fact]
-        public void Get_IdIsEmptyOrNull_ThrowsArgumentNullException()
+        public void Details_IdIsEmptyOrNull_ThrowsArgumentNullException()
         {
-            var movieController = new MoviesController(_movieService.Object);
-            Assert.Throws<ArgumentNullException>(() => movieController.Get(movieId: string.Empty));
-            Assert.Throws<ArgumentNullException>(() => movieController.Get(movieId: null));
+            var movieController = GetControllerInstance();
+            Assert.Throws<ArgumentNullException>(() => movieController.Details(movieId: string.Empty));
+            Assert.Throws<ArgumentNullException>(() => movieController.Details(movieId: null));
         }
 
+
+        [Fact]
+        public void Get_EmptyMovieSearchParams_ReturnsListOfMatchingMovies()
+        {
+            var movieController = GetControllerInstance();
+            var result = movieController.Get();
+            var okResult = result as ObjectResult;
+
+            Assert.NotNull(okResult);
+            Assert.Equal(StatusCodes.Status200OK, okResult.StatusCode);
+            Assert.IsType<List<Movie>>(okResult.Value);
+            Assert.Equivalent(GetListOfMovies(), okResult.Value);
+        }
 
         [Theory]
         [InlineData(MOVIE_TITLE)]
@@ -74,7 +83,7 @@ namespace BMB.API.Test.Controllers
             {
                 searchQuery = query
             };
-            var movieController = new MoviesController(_movieService.Object);
+            var movieController = GetControllerInstance();
             var result = movieController.Get(searchParams);
             var okResult = result as ObjectResult;
 
@@ -87,7 +96,7 @@ namespace BMB.API.Test.Controllers
         [Fact]
         public void Add_InsertMovie_Pass()
         {
-            var movieController = new MoviesController(_movieService.Object);
+            var movieController = GetControllerInstance();
             var result = movieController.Add(GetMovie());
             var okResult = result as ObjectResult;
 
@@ -100,7 +109,7 @@ namespace BMB.API.Test.Controllers
         {
             var movie = GetMovie();
             movie.Title = string.Empty;
-            var movieController = new MoviesController(_movieService.Object);
+            var movieController = GetControllerInstance();
             var result = movieController.Add(movie);
             var badReqResult = result as ObjectResult;
             Assert.NotNull(badReqResult);
@@ -112,7 +121,7 @@ namespace BMB.API.Test.Controllers
         public void Add_InsertNullMovie_ExpectBadRequest()
         {
             Movie movie = null;
-            var movieController = new MoviesController(_movieService.Object);
+            var movieController = GetControllerInstance();
             var result = movieController.Add(movie);
             var badRequestResult = result as BadRequestResult;
             Assert.IsType<BadRequestResult>(badRequestResult);
@@ -122,7 +131,7 @@ namespace BMB.API.Test.Controllers
         [Fact]
         public void Update_UpdateMovie_Pass()
         {
-            var movieController = new MoviesController(_movieService.Object);
+            var movieController = GetControllerInstance();
             var result = movieController.Update(GetMovie());
             var okResult = result as ObjectResult;
 
@@ -135,7 +144,7 @@ namespace BMB.API.Test.Controllers
         {
             var movie = GetMovie();
             movie.Id = string.Empty;
-            var movieController = new MoviesController(_movieService.Object);
+            var movieController = GetControllerInstance();
             var result = movieController.Update(movie);
             var badReqResult = result as ObjectResult;
             Assert.NotNull(badReqResult);
@@ -148,7 +157,7 @@ namespace BMB.API.Test.Controllers
         {
             var movie = GetMovie();
             movie.Title = string.Empty;
-            var movieController = new MoviesController(_movieService.Object);
+            var movieController = GetControllerInstance();
             var result = movieController.Update(movie);
             var badReqResult = result as ObjectResult;
             Assert.NotNull(badReqResult);
@@ -160,11 +169,9 @@ namespace BMB.API.Test.Controllers
         public void Update_UpdateNullMovie_ExpectBadRequest()
         {
             Movie movie = null;
-            var movieController = new MoviesController(_movieService.Object);
+            var movieController = GetControllerInstance();
             var result = movieController.Update(movie);
-            var badReqResult = result as ObjectResult;
-            Assert.NotNull(badReqResult);
-
+            var badReqResult = result as BadRequestResult;
             Assert.Equal(StatusCodes.Status400BadRequest, badReqResult.StatusCode);
         }
 
@@ -174,7 +181,7 @@ namespace BMB.API.Test.Controllers
         [InlineData(MOVIE_ID)]
         public void Delete_SendMovieId_Pass(string movieId)
         {
-            var movieController = new MoviesController(_movieService.Object);
+            var movieController = GetControllerInstance();
             var result = movieController.Delete(movieId);
             var okResult = result as ObjectResult;
             Assert.NotNull(okResult);
@@ -185,7 +192,7 @@ namespace BMB.API.Test.Controllers
         public void Delete_SendNullOrEmptyId_ExpectBadRequest()
         {
             string movieId = string.Empty;
-            var movieController = new MoviesController(_movieService.Object);
+            var movieController = GetControllerInstance();
             var result = movieController.Delete(movieId);
             var badReqResult = result as ObjectResult;
             Assert.NotNull(badReqResult);
@@ -196,7 +203,10 @@ namespace BMB.API.Test.Controllers
 
 
 
-
+        private MoviesController GetControllerInstance()
+        {
+            return new MoviesController(_movieService.Object);
+        }
 
         private List<Movie> GetListOfMovies()
         {

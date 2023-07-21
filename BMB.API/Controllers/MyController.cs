@@ -22,7 +22,7 @@ namespace BMB.API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            if (User.Identity != null && User.Identity.IsAuthenticated)
+            if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
             {
                 var userId = User.Identity.GetUserId();
                 var movies = _userMovieService.GetMoviesForUser(userId);
@@ -39,7 +39,7 @@ namespace BMB.API.Controllers
             {
                 return BadRequest("Movie Id is required");
             }
-            if (User.Identity != null && User.Identity.IsAuthenticated)
+            if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
             {
                 var userId = User.Identity.GetUserId();
                 _userMovieService.AddMovieToUserList(userId, movieId);
@@ -56,7 +56,7 @@ namespace BMB.API.Controllers
             {
                 return BadRequest("Movie Id is required");
             }
-            if (User.Identity != null && User.Identity.IsAuthenticated)
+            if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
             {
                 var userId = User.Identity.GetUserId();
                 _userMovieService.RemoveMovieFromUserList(userId, movieId);
@@ -74,7 +74,7 @@ namespace BMB.API.Controllers
             {
                 return BadRequest("Movie Id is required");
             }
-            if (User.Identity != null && User.Identity.IsAuthenticated)
+            if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
             {
                 var userId = User.Identity.GetUserId();
                 _userMovieService.ChangeMovieWatchStatus(userId, movieId, true);
