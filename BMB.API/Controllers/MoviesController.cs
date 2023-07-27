@@ -1,6 +1,8 @@
 ﻿
+using BMB.API.Extensions;
 using BMB.Entities.DTO;
 using BMB.Entities.Models;
+using BMB.Services;
 using BMB.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,17 +24,30 @@ namespace BMB.API.Controllers
 
 
         [HttpGet]
-        public IActionResult Get(MovieSearchParams? searchParams = null)
+        public IActionResult Get()
         {
-            List<Movie> movies;
+            MovieSearchParams movieSearchParams = new MovieSearchParams();
+            if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                movieSearchParams.userId = User.Identity.GetUserId();
+            }
+            List<UserMovieDTO> movies = _movieService.Get(movieSearchParams);
+            return Ok(movies);
+        }
+        [HttpPost]
+        [Route("Search")]
+        [HttpGet]
+        public IActionResult Search(MovieSearchParams? searchParams = null)
+        {
             if (searchParams == null)
             {
-                movies = _movieService.GetAll();
+                searchParams = new MovieSearchParams();
             }
-            else
+            if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
             {
-                movies = _movieService.Get(searchParams);
+                searchParams.userId = User.Identity.GetUserId();
             }
+            List<UserMovieDTO> movies = _movieService.Get(searchParams);
             return Ok(movies);
         }
 

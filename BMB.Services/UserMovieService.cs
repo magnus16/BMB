@@ -12,11 +12,21 @@ namespace BMB.Services
     {
         private readonly IMovieRepository _movieRepository;
         private readonly IUserMovieRepository _userMovieRepository;
+        private readonly IUserRepository _userRepository;
 
-        public UserMovieService(IMovieRepository movieRepository, IUserMovieRepository userMovieRepository)
+        public UserMovieService(IMovieRepository movieRepository,
+            IUserMovieRepository userMovieRepository)
         {
             _movieRepository = movieRepository;
             _userMovieRepository = userMovieRepository;
+        }
+        public UserMovieService(IMovieRepository movieRepository,
+            IUserMovieRepository userMovieRepository,
+            IUserRepository userRepository)
+        {
+            _movieRepository = movieRepository;
+            _userMovieRepository = userMovieRepository;
+            _userRepository = userRepository;
         }
 
         public void AddMovieToUserList(string userId, string movieId)
@@ -56,11 +66,9 @@ namespace BMB.Services
 
             var movieCollection = _movieRepository.GetCollection();
             var userMovieCollection = _userMovieRepository.GetCollection();
+            var userCollectiomn = _userRepository.GetCollection();
 
-            //var res = userCollection.Aggregate()
-            //                        .Unwind<User, UserMovieDTO>(x => x.Movies).ToList();
 
-            
             List<UserMovieDTO> userMoviesDTO = userMovieCollection.AsQueryable()
                                     .Where(u => u.UserId == userId)
                                     .Join(movieCollection.AsQueryable(), um => um.MovieId, mov => mov.Id, (um, mov) => new UserMovieDTO()
@@ -73,9 +81,16 @@ namespace BMB.Services
                                         ImageURL = mov.ImageURL,
                                         Rating = mov.Rating,
                                         ReleaseDate = mov.ReleaseDate,
-                                        Title = mov.Title
+                                        Title = mov.Title,
+                                        UserId = um.UserId
                                     }).ToList();
             return userMoviesDTO;
+        }
+
+        public UserMovie GetUserMovieByUserIdAndMovieId(string userId, string movieId)
+        {
+            var filter = Builders<UserMovie>.Filter.Where(um => um.UserId == userId && um.MovieId == movieId);
+            return _userMovieRepository.Find(filter).FirstOrDefault();
         }
 
         public void RemoveMovieFromUserList(string userId, string movieId)

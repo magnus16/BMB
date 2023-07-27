@@ -1,4 +1,5 @@
-﻿using BMB.Data.Abstractions;
+﻿using BMB.API.Extensions;
+using BMB.Data.Abstractions;
 using BMB.Entities.DTO;
 using BMB.Entities.Models;
 using BMB.Services;
@@ -17,6 +18,7 @@ using System.Text;
 
 namespace BMB.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -31,7 +33,7 @@ namespace BMB.API.Controllers
 
         [HttpPost("AddUser")]
         public IActionResult AddUser(User user)
-        {        
+        {
             _userService.CreateUser(user);
             return Ok(new
             {
@@ -51,9 +53,18 @@ namespace BMB.API.Controllers
         public IActionResult Login([FromBody] UserLogin data)
         {
             IActionResult response = Unauthorized();
-            if (_userService.ValidateUser(data.UserName, data.Password, out User? user))
+            if (_userService.ValidateUser(data.Username, data.Password, out User? user))
             {
                 var tokenString = GenerateJSONWebToken(user);
+                var cookieOptions = new CookieOptions()
+                {
+                    IsEssential = true,
+                    Expires = DateTime.Now.AddDays(1),
+                    Secure = true,
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.None
+                };
+                Response.Cookies.Append("AuthCookie", tokenString, cookieOptions);
                 response = Ok(new { Token = tokenString, Message = "Success" });
             }
             return response;
@@ -85,14 +96,29 @@ namespace BMB.API.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        [HttpGet]
+        public IActionResult Get()
+        {
+            if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userId = User.Identity.GetUserId();
+                var user = _userService.GetById(userId);
+                return Ok(new
+                {
+                    userId = user.Id,
+                    user.Username,
+                    user.Email
+                });
+            }
+            return Unauthorized();
+        }
 
         [HttpGet]
-        [Route("GetToken")]
-        public async Task<IEnumerable<string>> Get()
+        [Route("Logout")]
+        public IActionResult Logout()
         {
-            var accessToken = await HttpContext.GetTokenAsync("access_token");
-
-            return new string[] { accessToken };
+            Response.Cookies.Delete("AuthCookie");
+            return Ok();
         }
 
 

@@ -1,10 +1,10 @@
 import React from "react";
 
 
-export const MoviesPage = () =>{
+export const RegisterPage = () =>{
     return(
         <div className="main">
-            <h1>MOVIES</h1>
+            <h1>Register</h1>
         </div>
     );
 }

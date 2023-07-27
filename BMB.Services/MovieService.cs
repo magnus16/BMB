@@ -12,9 +12,11 @@ namespace BMB.Services
     public class MovieService : IMovieService
     {
         private readonly IMovieRepository _movieRepository;
-        public MovieService(IMovieRepository movieRepository)
+        private readonly IUserMovieRepository _userMovieRepository;
+        public MovieService(IMovieRepository movieRepository, IUserMovieRepository userMovieRepository)
         {
             _movieRepository = movieRepository;
+            _userMovieRepository = userMovieRepository;
         }
 
         public void Add(Movie movie)
@@ -30,17 +32,17 @@ namespace BMB.Services
         {
             return _movieRepository.GetAll().ToList();
         }
-        public List<Movie> Get(MovieSearchParams searchParams)
+        public List<UserMovieDTO> Get(MovieSearchParams searchParams)
         {
-            if (searchParams == null)
-            {
-                return GetAll();
-            }
+
             var _collection = _movieRepository.GetCollection();
             var movieQuery = _collection.AsQueryable();
+
             FilterDefinition<Movie> filterDef = Builders<Movie>.Filter.Empty;
             if (!string.IsNullOrEmpty(searchParams.searchQuery))
+
             {
+
                 //Method 1
                 //this code (commented below) only searches for full words and not partial
                 //though it performs much faster because for indexes
@@ -51,7 +53,8 @@ namespace BMB.Services
                 //var regex = new Regex(searchParams.searchQuery, RegexOptions.IgnoreCase);
                 //movieQuery = movieQuery.Where(x => regex.IsMatch(x.Title));
 
-                //Method 3
+                //Method 3 
+
                 filterDef = filterDef & Builders<Movie>.Filter.Regex("Title", new BsonRegularExpression(searchParams.searchQuery));
 
             }
@@ -89,8 +92,36 @@ namespace BMB.Services
                 query.Sort(sortDef);
             }
 
+
+
             //return movieQuery.Skip(searchParams.pageSize * (searchParams.pageNumber - 1)).Take(searchParams.pageSize).ToList();
-            return query.Skip(searchParams.pageSize * (searchParams.pageNumber - 1)).Limit(searchParams.pageSize).ToList();
+
+            var movieList = query.Skip(searchParams.pageSize * (searchParams.pageNumber - 1)).Limit(searchParams.pageSize).ToList();
+            List<UserMovie> userMovies = new List<UserMovie>();
+            if (!string.IsNullOrEmpty(searchParams.userId))
+            {
+                var filter = Builders<UserMovie>.Filter.Eq("UserId", ObjectId.Parse(searchParams.userId));
+                userMovies = _userMovieRepository.Find(filter).ToList();
+            }
+            List<UserMovieDTO> dto = (from mov in movieList
+                                      join um in userMovies
+                                      on mov.Id equals um.MovieId
+                                      into userMovieJoin
+                                      from umj in userMovieJoin.DefaultIfEmpty()
+                                      select new UserMovieDTO()
+                                      {
+                                          MovieId = mov.Id,
+                                          Watched = umj != null ? umj.Watched : false,
+                                          WatchedOn = umj != null ? umj.WatchedOn : null,
+                                          Description = mov.Description,
+                                          Genre = mov.Genre,
+                                          ImageURL = mov.ImageURL,
+                                          Rating = mov.Rating,
+                                          ReleaseDate = mov.ReleaseDate,
+                                          Title = mov.Title,
+                                          UserId = umj != null ? umj.UserId : null
+                                      }).ToList();
+            return dto;
         }
 
         public Movie GetById(string id)

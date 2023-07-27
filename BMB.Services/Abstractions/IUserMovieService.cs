@@ -1,4 +1,5 @@
 ﻿using BMB.Entities.DTO;
+using BMB.Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,6 @@ namespace BMB.Services.Abstractions
         void Delete(string id);
         void ChangeMovieWatchStatus(string userId, string movieId, bool watched);
         List<UserMovieDTO> GetMoviesForUser(string userId);
+        UserMovie GetUserMovieByUserIdAndMovieId(string userId, string movieId);
     }
 }

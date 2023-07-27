@@ -78,7 +78,8 @@ namespace BMB.Data
 
         public void Delete(string id)
         {
-            _collection.DeleteOne(id);
+
+            _collection.DeleteOne(x => x.Id == id);
         }
 
         public T GetById(string id)

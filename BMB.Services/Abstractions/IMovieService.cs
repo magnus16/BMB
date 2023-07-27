@@ -10,7 +10,7 @@ namespace BMB.Services.Abstractions
 {
     public interface IMovieService
     {
-        List<Movie> Get(MovieSearchParams searchParams);
+        List<UserMovieDTO> Get(MovieSearchParams searchParams);
         List<Movie> GetAll();
         Movie GetById(string id);
         void Add(Movie movie);

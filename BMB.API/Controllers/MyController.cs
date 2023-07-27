@@ -67,7 +67,7 @@ namespace BMB.API.Controllers
         }
 
         [HttpPost]
-        [Route("Watched/{movieId}")]
+        [Route("ChangeWatchStatus/{movieId}")]
         public IActionResult Watched(string movieId)
         {
             if (string.IsNullOrEmpty(movieId))
@@ -77,7 +77,30 @@ namespace BMB.API.Controllers
             if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
             {
                 var userId = User.Identity.GetUserId();
-                _userMovieService.ChangeMovieWatchStatus(userId, movieId, true);
+
+                var userMovie = _userMovieService.GetUserMovieByUserIdAndMovieId(userId, movieId);
+                if (userMovie == null)
+                {
+                    return BadRequest();
+                }
+                _userMovieService.ChangeMovieWatchStatus(userId, movieId, !userMovie.Watched);
+                return Ok();
+            }
+            return Unauthorized();
+        }
+
+        [HttpPost]
+        [Route("ChangeWatchStatus/{movieId}/{status}")]
+        public IActionResult Watched(string movieId, bool status)
+        {
+            if (string.IsNullOrEmpty(movieId))
+            {
+                return BadRequest("Movie Id is required");
+            }
+            if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userId = User.Identity.GetUserId();
+                _userMovieService.ChangeMovieWatchStatus(userId, movieId, status);
                 return Ok();
             }
             return Unauthorized();

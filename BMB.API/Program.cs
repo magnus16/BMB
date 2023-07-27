@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.Extensions.Options;
 
 namespace BMB.API
 {
@@ -88,7 +89,23 @@ namespace BMB.API
                     ValidAudience = JwtIssuer,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey)) //Configuration["JwtToken:SecretKey"]  
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        string? cookie = context.Request.Cookies["AuthCookie"];
+                        if (!string.IsNullOrEmpty(cookie))
+                        {
+                            context.Token = cookie;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+
             });
+
+
+
 
             builder.Services.AddAuthorization();
 
@@ -109,7 +126,16 @@ namespace BMB.API
 
             app.UseCors(x => x.AllowAnyHeader()
                               .AllowAnyMethod()
-                              .AllowAnyOrigin());
+                              .WithOrigins(new string[]
+                              {
+                                  "http://localhost:3001",
+                                  "http://localhost:3000",
+                              })
+                              .AllowCredentials());
+            //app.UseCors(x => x.AllowAnyHeader()
+            //                  .AllowAnyMethod()
+            //                  .AllowAnyOrigin());
+
 
             app.UseAuthentication();
             app.UseAuthorization();

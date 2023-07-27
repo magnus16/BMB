@@ -7,8 +7,10 @@ const LoaderWrapper = styled.div`
         top: 0;
         bottom: 0;
         background-color: rgba(1,3,0,0.7);
+        z-index:10000;
     `;
 export const Loader = (props: any) => {
+    
     
     return (
         <>{props.enabled && <LoaderWrapper>

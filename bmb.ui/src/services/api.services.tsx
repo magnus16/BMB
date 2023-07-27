@@ -1,19 +1,33 @@
-import axios from "axios";
-import { Movie } from "../models/movie.model";
+import axios, { AxiosRequestConfig } from "axios";
+import { Movie } from "../models/models";
+import { store } from "../store";
+import { setLoginStatus } from "../store/user";
 const BASE_URL = "https://localhost:7207/api";
-const userToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjY0YmEyMjgwODc0OTZmZTc5MTNmNTgzMSIsInVuaXF1ZV9uYW1lIjoibG9rZXNoIiwibmJmIjoxNjkwMTgyNDM3LCJleHAiOjE2OTAxODk2MzcsImlhdCI6MTY5MDE4MjQzNywiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzIwNy8iLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MjA3LyJ9.tDhbl6UY0D5bqFW0Mpx0X19ayvXtd9JDXVAN93r4jwc";
 
+
+axios.defaults.baseURL = BASE_URL;
+axios.defaults.withCredentials = true;
+
+axios.interceptors.response.use(response => {
+    return response;
+}, error => {
+    if (error.response.status === 401) {
+        store.dispatch(setLoginStatus(false));
+        window.location.reload();
+    }
+    return error;
+});
 
 const ApiService = {
-    loadDashboardData: function () {
 
-        return axios.get<Movie[]>('/my',{
-            baseURL:BASE_URL,
-            headers:{
-                Authorization: 'Bearer ' + userToken
-            }
-        });
-    }
+    getMyMovies: () => axios.get<Movie[]>('/my'),
+    loginUser: ({ username, password }: { username: string, password: string }) => axios.post('/account/login', { username, password }),
+    getUser: () => axios.get<Movie[]>('/account'),
+    watchMovie: (movieId: string, status: boolean) => axios.post('/my/ChangeWatchStatus/' + movieId),
+    getMovies: () => axios.get('/movies'),
+    newMovie: (movie: Movie) => axios.post('/movies/new', movie),
+    addMovieToList: (movieId: string) => axios.post(`/my/AddMovie/${movieId}`),
+    removeMovieFromList: (movieId: string) => axios.post(`/my/RemoveMovie/${movieId}`)
 };
 
 export default ApiService;
