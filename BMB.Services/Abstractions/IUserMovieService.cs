@@ -16,5 +16,6 @@ namespace BMB.Services.Abstractions
         void ChangeMovieWatchStatus(string userId, string movieId, bool watched);
         List<UserMovieDTO> GetMoviesForUser(string userId);
         UserMovie GetUserMovieByUserIdAndMovieId(string userId, string movieId);
+        void RateMovie(string userId, string movieId, double rating);
     }
 }

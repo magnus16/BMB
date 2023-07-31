@@ -22,11 +22,11 @@ namespace BMB.API.Test.Controllers
                          .Returns(GetMovie());
             _movieService.Setup(m =>
                                 m.Get(It.Is<MovieSearchParams>(sp =>
-                                        !string.IsNullOrEmpty(sp.searchQuery) && sp.searchQuery == MOVIE_TITLE)))
+                                        !string.IsNullOrEmpty(sp.query) && sp.query == MOVIE_TITLE)))
                         .Returns(GetListOfMovies());
             _movieService.Setup(m =>
                                 m.GetAll())
-                          .Returns(GetListOfMovies());
+                          .Returns(new List<Movie> { GetMovie() });
         }
 
 
@@ -63,10 +63,10 @@ namespace BMB.API.Test.Controllers
 
 
         [Fact]
-        public void Get_EmptyMovieSearchParams_ReturnsListOfMatchingMovies()
+        public void Search_EmptyMovieSearchParams_ReturnsListOfMatchingMovies()
         {
             var movieController = GetControllerInstance();
-            var result = movieController.Get();
+            var result = movieController.Search();
             var okResult = result as ObjectResult;
 
             Assert.NotNull(okResult);
@@ -77,14 +77,14 @@ namespace BMB.API.Test.Controllers
 
         [Theory]
         [InlineData(MOVIE_TITLE)]
-        public void Get_SearchByQuery_ReturnsListOfMatchingMovies(string query)
+        public void Search_SearchByQuery_ReturnsListOfMatchingMovies(string query)
         {
             MovieSearchParams searchParams = new MovieSearchParams
             {
-                searchQuery = query
+                query = query
             };
             var movieController = GetControllerInstance();
-            var result = movieController.Get(searchParams);
+            var result = movieController.Search(searchParams);
             var okResult = result as ObjectResult;
 
             Assert.NotNull(okResult);
@@ -208,13 +208,19 @@ namespace BMB.API.Test.Controllers
             return new MoviesController(_movieService.Object);
         }
 
-        private List<Movie> GetListOfMovies()
+        private List<UserMovieDTO> GetListOfMovies()
         {
-            return new List<Movie>
+            return new List<UserMovieDTO>
             {
-                GetMovie(),
-                GetMovie()
-            };
+                new UserMovieDTO()
+                {
+                    Id = "abc123",
+                    ReleaseDate = new DateTime(2023, 01, 01),
+                    Title = "Title",
+                    Description = "Description",
+                    Genre = "Sci-Fi"
+                }
+        };
         }
         private Movie GetMovie()
         {
@@ -224,8 +230,7 @@ namespace BMB.API.Test.Controllers
                 ReleaseDate = new DateTime(2023, 01, 01),
                 Title = "Title",
                 Description = "Description",
-                Genre = "Sci-Fi",
-                Rating = 10
+                Genre = "Sci-Fi"
             };
         }
     }

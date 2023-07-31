@@ -67,7 +67,7 @@ export const NavMenu = (props: any) => {
 const links = [
     { name: 'Home', url: '/home' },
     { name: 'Movies', url: '/movies' },
-    { name: 'Users', url: '/users' },
+    // { name: 'Users', url: '/users' },
 ];
 
 export const Navbar = () => {

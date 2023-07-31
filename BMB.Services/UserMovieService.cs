@@ -79,7 +79,7 @@ namespace BMB.Services
                                         Description = mov.Description,
                                         Genre = mov.Genre,
                                         ImageURL = mov.ImageURL,
-                                        Rating = mov.Rating,
+                                        Rating = um.Rating,
                                         ReleaseDate = mov.ReleaseDate,
                                         Title = mov.Title,
                                         UserId = um.UserId
@@ -91,6 +91,17 @@ namespace BMB.Services
         {
             var filter = Builders<UserMovie>.Filter.Where(um => um.UserId == userId && um.MovieId == movieId);
             return _userMovieRepository.Find(filter).FirstOrDefault();
+        }
+
+        public void RateMovie(string userId, string movieId, double rating)
+        {
+            var filter = Builders<UserMovie>.Filter.Where(um => um.UserId == userId && um.MovieId == movieId);
+            var userMovie = _userMovieRepository.Find(filter).FirstOrDefault();
+            if (userMovie != null)
+            {
+                userMovie.Rating = rating;
+                _userMovieRepository.Update(userMovie.Id, userMovie);
+            }
         }
 
         public void RemoveMovieFromUserList(string userId, string movieId)

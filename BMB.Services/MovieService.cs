@@ -35,11 +35,11 @@ namespace BMB.Services
         public List<UserMovieDTO> Get(MovieSearchParams searchParams)
         {
 
-            var _collection = _movieRepository.GetCollection();
-            var movieQuery = _collection.AsQueryable();
+            var _movieCollection = _movieRepository.GetCollection();
+            var movieQuery = _movieCollection.AsQueryable();
 
             FilterDefinition<Movie> filterDef = Builders<Movie>.Filter.Empty;
-            if (!string.IsNullOrEmpty(searchParams.searchQuery))
+            if (!string.IsNullOrEmpty(searchParams.query))
 
             {
 
@@ -55,15 +55,15 @@ namespace BMB.Services
 
                 //Method 3 
 
-                filterDef = filterDef & Builders<Movie>.Filter.Regex("Title", new BsonRegularExpression(searchParams.searchQuery));
+                filterDef = filterDef & Builders<Movie>.Filter.Regex("Title", new BsonRegularExpression(searchParams.query, "i"));
 
             }
 
 
 
-            if (searchParams.GenreType.HasValue)
+            if (searchParams.Genre.HasValue)
             {
-                var genreText = Enums.GetGenreText(searchParams.GenreType.Value);
+                var genreText = Enums.GetGenreText(searchParams.Genre.Value);
                 //var filter = Builders<Movie>.Filter.Eq("Genre", genreText);
                 //movieQuery = movieQuery.Where(_ => filter.Inject());
                 filterDef = filterDef & Builders<Movie>.Filter.Eq("Genre", genreText);
@@ -77,7 +77,7 @@ namespace BMB.Services
                 filterDef = filterDef & Builders<Movie>.Filter.Gte(x => x.ReleaseDate, date);
                 filterDef = filterDef & Builders<Movie>.Filter.Lte(x => x.ReleaseDate, endDate);
             }
-            var query = _collection.Find(filterDef);
+            var query = _movieCollection.Find(filterDef);
             if (!string.IsNullOrEmpty(searchParams.sortBy))
             {
                 SortDefinition<Movie> sortDef;
@@ -97,31 +97,47 @@ namespace BMB.Services
             //return movieQuery.Skip(searchParams.pageSize * (searchParams.pageNumber - 1)).Take(searchParams.pageSize).ToList();
 
             var movieList = query.Skip(searchParams.pageSize * (searchParams.pageNumber - 1)).Limit(searchParams.pageSize).ToList();
-            List<UserMovie> userMovies = new List<UserMovie>();
+            var movieIds = movieList.Select(m => m.Id).ToList();
+            //var userMovies = _userMovieRepository.Find()
+            var userMovies = _userMovieRepository.GetCollection().AsQueryable()
+                                    .Where(um => movieIds.Any(id => id == um.MovieId))
+                                    .ToList();
+
+            var ratedMovies = (from mov in movieList
+                               join um in userMovies on mov.Id equals um.MovieId
+                               into userMovieJoin
+                               from umj in userMovieJoin.DefaultIfEmpty()
+                               select new
+                               {
+                                   Rating = (umj != null) ? umj.Rating : null,
+                                   Movie = mov
+                               })
+                       .GroupBy(g => g.Movie)
+                       .Select(g => new UserMovieDTO()
+                       {
+                           MovieId = g.Key.Id,
+                           Description = g.Key.Description,
+                           Genre = g.Key.Genre,
+                           ImageURL = g.Key.ImageURL,
+                           Rating = (g.Where(r => r.Rating.HasValue).Select(r => r.Rating)).Average(),
+                           ReleaseDate = g.Key.ReleaseDate,
+                           Title = g.Key.Title,
+                           UserId = null
+                       }).ToList();
+
             if (!string.IsNullOrEmpty(searchParams.userId))
             {
                 var filter = Builders<UserMovie>.Filter.Eq("UserId", ObjectId.Parse(searchParams.userId));
                 userMovies = _userMovieRepository.Find(filter).ToList();
+                foreach (var um in userMovies)
+                {
+                    var mov = ratedMovies.Where(m => m.MovieId == um.MovieId).FirstOrDefault();
+                    mov.Watched = um.Watched;
+                    mov.WatchedOn = um.WatchedOn;
+                    mov.UserId = um.UserId;
+                }
             }
-            List<UserMovieDTO> dto = (from mov in movieList
-                                      join um in userMovies
-                                      on mov.Id equals um.MovieId
-                                      into userMovieJoin
-                                      from umj in userMovieJoin.DefaultIfEmpty()
-                                      select new UserMovieDTO()
-                                      {
-                                          MovieId = mov.Id,
-                                          Watched = umj != null ? umj.Watched : false,
-                                          WatchedOn = umj != null ? umj.WatchedOn : null,
-                                          Description = mov.Description,
-                                          Genre = mov.Genre,
-                                          ImageURL = mov.ImageURL,
-                                          Rating = mov.Rating,
-                                          ReleaseDate = mov.ReleaseDate,
-                                          Title = mov.Title,
-                                          UserId = umj != null ? umj.UserId : null
-                                      }).ToList();
-            return dto;
+            return ratedMovies;
         }
 
         public Movie GetById(string id)

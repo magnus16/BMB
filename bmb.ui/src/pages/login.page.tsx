@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ApiService from "../services/api.services";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
@@ -13,6 +13,13 @@ export const LoginPage = () => {
     const user = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user.isAuthenticated) {
+            navigate('/')
+        }
+    })
+
 
     let loginUser = async (e: any) => {
         e.preventDefault();
@@ -35,8 +42,8 @@ export const LoginPage = () => {
     }
     return (
         <main className="w-100 mt-5 m-auto h-100 d-flex justify-content-center align-items-center">
-            <form className=" mt-5" style={{ width: '400px' }} onSubmit={loginUser}>
-                <h1 className="h3  mt-5 mb-3 fw-normal">Please sign in</h1>
+            <form className=" mt-5 p-5 border bg-light" style={{ width: '500px' }} onSubmit={loginUser}>
+                <h1 className="h3  mb-3 fw-normal">Please sign in</h1>
                 <div className="mb-3">
                     <label className="form-label">Username</label>
                     <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control" id="username" />
@@ -46,7 +53,10 @@ export const LoginPage = () => {
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" />
                 </div>
                 <button className="btn btn-primary w-100 py-2" type="submit">Sign in</button>
-
+                <div className="text-center  opacity-75 m-3">OR</div>
+                <div className="d-grid">
+                    <a href="/register" className="btn btn-outline-primary btn-full">Register</a>
+                </div>
             </form>
         </main>
     );

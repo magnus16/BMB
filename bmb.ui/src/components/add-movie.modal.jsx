@@ -70,7 +70,7 @@ export const AddMovieModal = (props) => {
                                 <div className="mb-3">
                                     <label className="form-label">Genre</label>
                                     <Field className="form-select" name="genre" as="select">
-                                        <option value="SciFi">Science Fiction</option>
+                                        <option value="Sci-Fi">Science Fiction</option>
                                         <option value="Action">Action</option>
                                         <option value="Drama">Drama</option>
                                     </Field>

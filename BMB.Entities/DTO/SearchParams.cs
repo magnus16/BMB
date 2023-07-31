@@ -9,7 +9,7 @@ namespace BMB.Entities.DTO
 {
     public class SearchParams
     {
-        public string? searchQuery { get; set; } = null;
+        public string? query { get; set; } = null;
         public string? sortBy { get; set; } = null;
         public string sort { get; set; } = "desc";
         public int pageSize { get; set; } = 100;
@@ -19,7 +19,7 @@ namespace BMB.Entities.DTO
 
     public class MovieSearchParams : SearchParams
     {
-        public Enums.GenreType? GenreType { get; set; } = null;
+        public Enums.GenreType? Genre { get; set; } = null;
         public int? Year { get; set; } = null;
     }
 

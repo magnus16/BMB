@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { Movie } from "../models/models";
+import { Movie, SearchFilter } from "../models/models";
 import { store } from "../store";
 import { setLoginStatus } from "../store/user";
 const BASE_URL = "https://localhost:7207/api";
@@ -27,7 +27,11 @@ const ApiService = {
     getMovies: () => axios.get('/movies'),
     newMovie: (movie: Movie) => axios.post('/movies/new', movie),
     addMovieToList: (movieId: string) => axios.post(`/my/AddMovie/${movieId}`),
-    removeMovieFromList: (movieId: string) => axios.post(`/my/RemoveMovie/${movieId}`)
+    removeMovieFromList: (movieId: string) => axios.post(`/my/RemoveMovie/${movieId}`),
+    logout: () => axios.get('/account/Logout'),
+    register: (user: any) => axios.post('/account/AddUser', user),
+    rateMovie: (movieId: string, rating: number) => axios.post(`/my/ratemovie/${movieId}/${rating}`),
+    searchMovie: ((searchFilter: SearchFilter) => axios.post('/movies/search', searchFilter))
 };
 
 export default ApiService;

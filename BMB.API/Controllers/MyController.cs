@@ -106,6 +106,23 @@ namespace BMB.API.Controllers
             return Unauthorized();
         }
 
+        [HttpPost]
+        [Route("RateMovie/{movieId}/{rating}")]
+        public IActionResult RateMovie(string movieId, double rating)
+        {
+            if (string.IsNullOrEmpty(movieId))
+            {
+                return BadRequest("Movie Id is required");
+            }
+            if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userId = User.Identity.GetUserId();
+                _userMovieService.RateMovie(userId, movieId, rating);
+                return Ok();
+            }
+            return Unauthorized();
+        }
+
 
 
     }

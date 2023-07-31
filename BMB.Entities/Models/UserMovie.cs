@@ -16,5 +16,6 @@ namespace BMB.Entities.Models
         public string MovieId { get; set; } = string.Empty;
         public bool Watched { get; set; } = false;
         public DateTime? WatchedOn { get; set; }
+        public double? Rating { get; set; }
     }
 }

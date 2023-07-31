@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { User } from '../models/models';
 import { useNavigate } from 'react-router-dom';
+import ApiService from '../services/api.services';
 
 const userState: User = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : { isAuthenticated: false };
 
@@ -14,7 +15,7 @@ const userSlice = createSlice({
             if (!state.isAuthenticated) {
                 state.email = state.userId = state.username = undefined;
                 localStorage.removeItem('user');
-                
+                ApiService.logout();
             }
         },
         setUser: (state, action) => {

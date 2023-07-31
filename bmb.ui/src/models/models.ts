@@ -23,3 +23,9 @@ export interface User {
     email?: string;
     userId?: string;
 }
+
+export interface SearchFilter {
+    query?: string;
+    genre?: number;
+    year?: string;
+}
