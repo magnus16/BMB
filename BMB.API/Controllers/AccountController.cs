@@ -30,6 +30,7 @@ namespace BMB.API.Controllers
             _userService = userService;
             _config = config;
         }
+        
 
         [HttpPost("AddUser")]
         public IActionResult AddUser(User user)
@@ -43,6 +44,13 @@ namespace BMB.API.Controllers
 
         [HttpGet("GetAllUsers")]
         public IActionResult GetAllUsers()
+        {
+            var users = _userService.GetAll();
+            return Ok(users);
+        }
+
+        [HttpGet("GetTest")]
+        public IActionResult GetTest()
         {
             var users = _userService.GetAll();
             return Ok(users);
